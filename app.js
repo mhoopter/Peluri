@@ -153,6 +153,12 @@ async function loadTotaler() {
     // Sæson-kolonner: indeks 1–6  (2020/21 … 2025/26)
     const seasonLabels = headers.slice(1, 7).map(h => h.replace(' (kr)', '').replace(' kr', ''));
 
+    members.sort((a, b) => {
+      const aT = parseFloat(String(a[7] || '0').replace(/,/g, '')) || 0;
+      const bT = parseFloat(String(b[7] || '0').replace(/,/g, '')) || 0;
+      return bT - aT;
+    });
+
     const medals  = ['🥇', '🥈', '🥉'];
     const classes = ['rank-1', 'rank-2', 'rank-3'];
 
