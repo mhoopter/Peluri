@@ -4,7 +4,7 @@
 //  2. Kopier Sheet ID fra URL:  spreadsheets/d/HER_ER_ID/edit
 //  3. Indsæt ID herunder
 // ─────────────────────────────────────────────────────────────
-const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID';
+const SHEET_ID = '1upqu8Y9-8UxSjJKxHthJn2E1cImBjc51';
 const REFRESH_MS = 5 * 60 * 1000; // opdater hvert 5. minut
 // ─────────────────────────────────────────────────────────────
 
