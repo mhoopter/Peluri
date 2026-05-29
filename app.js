@@ -72,8 +72,19 @@ async function loadStilling() {
   try {
     const rows = await fetchCSV(SHEET_STILLING);
 
-    // Row 0 = titel, row 1 = headers, rows 2–7 = 6 spillere
-    const members = rows.slice(2, 8).filter(r => r[1] && r[1].trim() !== '');
+    // Find header row dynamically (contains 'Spiller')
+    const headerIdx = rows.findIndex(r => r.some(c => c && c.toLowerCase().includes('spiller')));
+
+    // Members: rows after header until non-numeric placering or empty name
+    const members = [];
+    if (headerIdx >= 0) {
+      for (let i = headerIdx + 1; i < rows.length; i++) {
+        const r = rows[i];
+        const name = r[1] ? r[1].trim() : '';
+        if (!name || name === '' || name.toLowerCase().includes('faelles') || name.toLowerCase().includes('boder') || name.toLowerCase().includes('samlet')) break;
+        members.push(r);
+      }
+    }
 
     // Find saldo (søg efter "SAMLET" i kolonne A)
     let saldo = '';
@@ -138,9 +149,20 @@ async function loadTotaler() {
   try {
     const rows = await fetchCSV(SHEET_TOTALER);
 
-    // Row 0 = titel, row 1 = headers, rows 2–7 = 6 spillere
-    const headers = rows[1] || [];
-    const members = rows.slice(2, 8).filter(r => r[0] && r[0].trim() !== '' && r[0].trim() !== '-');
+    // Find header row dynamically (contains 'Medlem')
+    const headerIdx = rows.findIndex(r => r.some(c => c && c.toLowerCase().includes('medlem')));
+    const headers = headerIdx >= 0 ? rows[headerIdx] : (rows[1] || []);
+
+    // Members: rows after header until faelles/total/empty
+    const members = [];
+    if (headerIdx >= 0) {
+      for (let i = headerIdx + 1; i < rows.length; i++) {
+        const r = rows[i];
+        const name = r[0] ? r[0].trim() : '';
+        if (!name || name === '' || name === '-' || name.toLowerCase().includes('faelles') || name.toLowerCase().includes('total')) break;
+        members.push(r);
+      }
+    }
 
     // Sæson-kolonner: indeks 1–6  (2020/21 … 2025/26)
     const seasonLabels = headers.slice(1, 7).map(h => h.replace(' (kr)', '').replace(' kr', ''));
