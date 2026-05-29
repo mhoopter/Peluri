@@ -9,7 +9,7 @@ const REFRESH_MS = 5 * 60 * 1000; // opdater hvert 5. minut
 // ─────────────────────────────────────────────────────────────
 
 const SHEET_STILLING = 'Web Stilling';
-const SHEET_TOTALER  = 'Web Historik';
+const SHEET_TOTALER  = 'Medlem Totaler';
 
 let activeTab = 'stilling';
 
