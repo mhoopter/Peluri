@@ -8,7 +8,7 @@ const SHEET_ID = '1jAt2yLfTdlHVjkD3Xen_su09GjJlH5MB';
 const REFRESH_MS = 5 * 60 * 1000; // opdater hvert 5. minut
 // ─────────────────────────────────────────────────────────────
 
-const SHEET_STILLING = 'Web Stilling';
+const SHEET_STILLING = 'Aktuel Saeson 2025-26';
 const SHEET_TOTALER  = 'Medlem Totaler';
 
 let activeTab = 'stilling';
