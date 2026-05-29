@@ -45,6 +45,12 @@ async function fetchCSV(sheetName) {
   return parseCSV(await res.text());
 }
 
+async function fetchURL(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return parseCSV(await res.text());
+}
+
 // ── Formattering ──────────────────────────────────────────────
 
 function fmtKr(v) {
@@ -74,9 +80,9 @@ async function loadStilling() {
     const sheet = encodeURIComponent(SHEET_STILLING) + '!';
 
     const [navne, gevinst, saldoRows] = await Promise.all([
-      fetchCSV(gviz + sheet + 'B2:B7'),
-      fetchCSV(gviz + sheet + 'C2:C7'),
-      fetchCSV(gviz + sheet + 'B25:B25'),
+      fetchURL(gviz + sheet + 'B2:B7'),
+      fetchURL(gviz + sheet + 'C2:C7'),
+      fetchURL(gviz + sheet + 'B25:B25'),
     ]);
 
     const saldo = saldoRows[0] ? saldoRows[0][0] : '';
