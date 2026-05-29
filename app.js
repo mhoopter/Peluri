@@ -8,8 +8,8 @@ const SHEET_ID = '1upqu8Y9-8UxSjJKxHthJn2E1cImBjc51';
 const REFRESH_MS = 5 * 60 * 1000; // opdater hvert 5. minut
 // ─────────────────────────────────────────────────────────────
 
-const SHEET_STILLING = 'Aktuel Saeson 2025-26';
-const SHEET_TOTALER  = 'Medlem Totaler';
+const SHEET_STILLING = 'Web Stilling';
+const SHEET_TOTALER  = 'Web Historik';
 
 let activeTab = 'stilling';
 
@@ -89,7 +89,7 @@ async function loadStilling() {
     // Find saldo (søg efter "SAMLET" i kolonne A)
     let saldo = '';
     for (const r of rows) {
-      if (r[0] && r[0].toUpperCase().includes('SAMLET')) { saldo = r[1]; break; }
+      if (r[0] && (r[0].toUpperCase().includes('SAMLET') || r[0].toUpperCase().includes('SALDO'))) { saldo = r[1]; break; }
     }
 
     const medals  = ['🥇', '🥈', '🥉'];
@@ -150,7 +150,7 @@ async function loadTotaler() {
     const rows = await fetchCSV(SHEET_TOTALER);
 
     // Find header row dynamically (contains 'Medlem')
-    const headerIdx = rows.findIndex(r => r.some(c => c && c.toLowerCase().includes('medlem')));
+    const headerIdx = rows.findIndex(r => r.some(c => c && (c.toLowerCase().includes('spiller') || c.toLowerCase().includes('medlem'))));
     const headers = headerIdx >= 0 ? rows[headerIdx] : (rows[1] || []);
 
     // Members: rows after header until faelles/total/empty
