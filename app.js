@@ -70,10 +70,10 @@ async function loadStilling() {
   const el = document.getElementById('stilling');
   el.innerHTML = '<div class="loading">Henter data</div>';
   try {
-    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_STILLING)}`;
+    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=1123887231`;
     const [dataRows, saldoRows] = await Promise.all([
       fetchCSV(base + '&range=A1:C7'),
-      fetchCSV(base + '&range=B25:B25'),
+      fetchCSV(base + '&range=B26:B26'),
     ]);
 
     // row 0 = headers, rows 1-6 = members (B2:C7)
