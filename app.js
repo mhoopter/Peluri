@@ -70,10 +70,10 @@ async function loadStilling() {
   const el = document.getElementById('stilling');
   el.innerHTML = '<div class="loading">Henter data</div>';
   try {
-    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=1123887231`;
-    const [dataRows, saldoRows] = await Promise.all([
-      fetchCSV(base + '&range=A1:C7'),
-      fetchCSV(base + '&range=B26:B26'),
+    const gviz = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+    const [dataRows, allRows] = await Promise.all([
+      fetchCSV(gviz + '&range=' + encodeURIComponent(SHEET_STILLING + '!A1:C7')),
+      fetchCSV(sheetUrl(SHEET_STILLING)),
     ]);
 
     // row 0 = headers, rows 1-6 = members (B2:C7)
@@ -86,7 +86,11 @@ async function loadStilling() {
       return vb - va;
     });
 
-    const saldo = saldoRows[0] ? saldoRows[0][0] : '';
+    // Saldo: search full sheet for SAMLET SALDO row
+    let saldo = '';
+    for (const r of allRows) {
+      if (r[0] && r[0].toUpperCase().includes('SAMLET')) { saldo = r[1]; break; }
+    }
     const medals = ['🥇', '🥈', '🥉'];
 
     const tRows = members.map((r, i) => {
