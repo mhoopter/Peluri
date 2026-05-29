@@ -70,33 +70,27 @@ async function loadStilling() {
   const el = document.getElementById('stilling');
   el.innerHTML = '<div class="loading">Henter data</div>';
   try {
-    const rows = await fetchCSV(SHEET_STILLING);
+    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_STILLING)}`;
+    const [dataRows, saldoRows] = await Promise.all([
+      fetchCSV(base + '&range=A1:C7'),
+      fetchCSV(base + '&range=B25:B25'),
+    ]);
 
-    // Find header row dynamically (contains 'Spiller')
-    const headerIdx = rows.findIndex(r => r.some(c => c && c.toLowerCase().includes('spiller')));
+    // row 0 = headers, rows 1-6 = members (B2:C7)
+    const members = dataRows.slice(1).filter(r => r[1] && r[1].trim());
 
-    // Members: rows after header until non-numeric placering or empty name
-    const members = [];
-    if (headerIdx >= 0) {
-      for (let i = headerIdx + 1; i < rows.length; i++) {
-        const r = rows[i];
-        const name = r[1] ? r[1].trim() : '';
-        if (!name || name === '' || name.toLowerCase().includes('faelles') || name.toLowerCase().includes('boder') || name.toLowerCase().includes('samlet')) break;
-        members.push(r);
-      }
-    }
+    // Sort by gevinst (col C = index 2) descending
+    members.sort((a, b) => {
+      const va = parseFloat(String(a[2]).replace(/[^\d]/g, '')) || 0;
+      const vb = parseFloat(String(b[2]).replace(/[^\d]/g, '')) || 0;
+      return vb - va;
+    });
 
-    // Find saldo (søg efter "SAMLET" i kolonne A)
-    let saldo = '';
-    for (const r of rows) {
-      if (r[0] && (r[0].toUpperCase().includes('SAMLET') || r[0].toUpperCase().includes('SALDO'))) { saldo = r[1]; break; }
-    }
-
-    const medals  = ['🥇', '🥈', '🥉'];
-    const classes = ['rank-1', 'rank-2', 'rank-3'];
+    const saldo = saldoRows[0] ? saldoRows[0][0] : '';
+    const medals = ['🥇', '🥈', '🥉'];
 
     const tRows = members.map((r, i) => {
-      const cls    = classes[i] || (i % 2 === 0 ? '' : '');
+      const cls    = ['rank-1', 'rank-2', 'rank-3'][i] || '';
       const rankEl = medals[i]
         ? `<span class="medal">${medals[i]}</span>`
         : `<span class="rank-num">${i + 1}.</span>`;
@@ -106,8 +100,6 @@ async function loadStilling() {
           <td style="white-space:nowrap">${rankEl}</td>
           <td><span class="player-name ${nameW}">${r[1]}</span></td>
           <td class="num ${nameW}">${fmtKr(r[2])}</td>
-          <td class="num">${r[3] || '<span class="dash">—</span>'}</td>
-          <td class="num">${fmtOdds(r[4])}</td>
         </tr>`;
     }).join('');
 
@@ -122,8 +114,6 @@ async function loadStilling() {
               <th style="width:52px">#</th>
               <th>Spiller</th>
               <th class="num">Gevinst</th>
-              <th class="num">Vundet</th>
-              <th class="num">Bedste Odds</th>
             </tr>
           </thead>
           <tbody>${tRows}</tbody>
