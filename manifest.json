@@ -1,0 +1,14 @@
+{
+  "name": "Peluri Tipsklub",
+  "short_name": "Peluri",
+  "description": "Indberét din uges spilresultat",
+  "start_url": "/report.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#5C0F0F",
+  "theme_color": "#8B1A1A",
+  "icons": [
+    { "src": "logo.jpg", "sizes": "192x192", "type": "image/jpeg" },
+    { "src": "logo.jpg", "sizes": "512x512", "type": "image/jpeg" }
+  ]
+}
