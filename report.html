@@ -201,7 +201,7 @@
 
     /* ── Amount input wrapper ── */
     .amount-wrap { position: relative; margin-bottom: 20px; }
-    .amount-wrap input { padding-right: 48px; font-size: 24px; font-weight: 700; text-align: center; }
+    .amount-wrap input { padding-left: 48px; padding-right: 48px; font-size: 24px; font-weight: 700; text-align: center; }
     .amount-wrap .currency {
       position: absolute;
       right: 16px;
@@ -457,6 +457,7 @@ function formatWeekDate() {
 async function api(payload) {
   const res = await fetch(APPS_SCRIPT_URL, {
     method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload)
   });
   return res.json();
