@@ -74,12 +74,10 @@ function doGet(e) {
   return jsonResponse({ ok: false, error: 'Ukendt action' });
 }
 
-// ── Login ────────────────────────────────────────────────────────
+// ── Login (ingen PIN — åben adgang med navn) ─────────────────────
 function handleLogin(data) {
-  const { name, pin } = data;
-  if (!PINS[name] || PINS[name] !== String(pin)) {
-    return jsonResponse({ ok: false, error: 'Forkert PIN' });
-  }
+  const { name } = data;
+  if (!MEMBER_ROWS[name]) return jsonResponse({ ok: false, error: 'Ukendt navn' });
   return jsonResponse({ ok: true, name });
 }
 

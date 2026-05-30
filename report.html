@@ -318,11 +318,11 @@
 <!-- ── LOGIN SCREEN ── -->
 <div class="screen active" id="loginScreen">
   <div class="card">
-    <p class="card-title">Log ind</p>
-    <div id="loginError" class="error-msg">Forkert PIN — prøv igen</div>
-    <label for="memberSelect">Hvem er du?</label>
+    <p class="card-title">Hvem er du?</p>
+    <div id="loginError" class="error-msg">Vælg dit navn</div>
+    <label for="memberSelect">Vælg dit navn</label>
     <select id="memberSelect">
-      <option value="">Vælg dit navn…</option>
+      <option value="">Vælg…</option>
       <option value="Ruhi Erdogan">Ruhi Erdogan</option>
       <option value="Alexander Hansen">Alexander Hansen</option>
       <option value="Frederick Larsen">Frederick Larsen</option>
@@ -330,9 +330,7 @@
       <option value="Lars Gonzalez">Lars Gonzalez</option>
       <option value="Sebastian Seecoomar">Sebastian Seecoomar</option>
     </select>
-    <label for="pinInput">PIN (4 cifre)</label>
-    <input type="password" id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••">
-    <button class="btn btn-primary" onclick="login()">Log ind</button>
+    <button class="btn btn-primary" onclick="login()">Fortsæt</button>
   </div>
 </div>
 
@@ -469,29 +467,15 @@ function showScreen(id) {
 }
 
 // ── Login ────────────────────────────────────────────────────────
-window.login = async function() {
+window.login = function() {
   const name = document.getElementById('memberSelect').value;
-  const pin  = document.getElementById('pinInput').value;
   const err  = document.getElementById('loginError');
   err.classList.remove('show');
-
-  if (!name) { err.textContent = 'Vælg dit navn'; err.classList.add('show'); return; }
-  if (!pin)  { err.textContent = 'Indtast din PIN'; err.classList.add('show'); return; }
-
-  try {
-    const res = await api({ action: 'login', name, pin });
-    if (!res.ok) { err.textContent = 'Forkert PIN — prøv igen'; err.classList.add('show'); return; }
-    currentMember = name;
-    localStorage.setItem('peluri_member', name);
-    showMain();
-  } catch (e) {
-    err.textContent = 'Kunne ikke forbinde — prøv igen'; err.classList.add('show');
-  }
+  if (!name) { err.classList.add('show'); return; }
+  currentMember = name;
+  localStorage.setItem('peluri_member', name);
+  showMain();
 };
-
-document.getElementById('pinInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') window.login();
-});
 
 // ── Logout ───────────────────────────────────────────────────────
 window.logout = function() {
