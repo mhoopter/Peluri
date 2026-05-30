@@ -382,13 +382,17 @@ footer {
   #stilling .data-table td { padding: 13px 14px; font-size: 14px; }
   .player-name { font-size: 14px; }
 
-  /* Historik table: hide the 3 oldest season columns (2020/21, 2021/22, 2022/23) */
+  /* Historik table: på mobil vis kun Spiller, 2025/26 og Total */
   #historik .data-table th:nth-child(2),
   #historik .data-table td:nth-child(2),
   #historik .data-table th:nth-child(3),
   #historik .data-table td:nth-child(3),
   #historik .data-table th:nth-child(4),
-  #historik .data-table td:nth-child(4) { display: none; }
+  #historik .data-table td:nth-child(4),
+  #historik .data-table th:nth-child(5),
+  #historik .data-table td:nth-child(5),
+  #historik .data-table th:nth-child(6),
+  #historik .data-table td:nth-child(6) { display: none; }
 
   #historik .data-table th,
   #historik .data-table td { padding: 12px 10px; font-size: 12px; }
