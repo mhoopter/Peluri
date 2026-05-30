@@ -111,19 +111,22 @@ async function loadStilling() {
     const gviz = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&range=`;
     const sheet = encodeURIComponent(SHEET_STILLING) + '!';
 
-    let navne, gevinst, saldoRows;
+    let navne, gevinst, spil, saldoRows;
     try {
-      [navne, gevinst, saldoRows] = await Promise.all([
+      [navne, gevinst, spil, saldoRows] = await Promise.all([
         fetchURL(gviz + sheet + 'B2:B7'),
         fetchURL(gviz + sheet + 'C2:C7'),
+        fetchURL(gviz + sheet + 'G2:G7'),
         fetchURL(gviz + sheet + 'B25:B25'),
       ]);
       saveCache('stilling_navne', navne);
       saveCache('stilling_gevinst', gevinst);
+      saveCache('stilling_spil', spil);
       saveCache('stilling_saldo', saldoRows);
     } catch (fetchErr) {
       navne     = loadCache('stilling_navne');
       gevinst   = loadCache('stilling_gevinst');
+      spil      = loadCache('stilling_spil') || [];
       saldoRows = loadCache('stilling_saldo');
       if (!navne) throw fetchErr;
       el.innerHTML += '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:-8px;padding-bottom:8px;">Viser seneste kendte data</div>';
@@ -132,17 +135,23 @@ async function loadStilling() {
     const saldo = saldoRows[0] ? saldoRows[0][0] : '';
     const medals = ['🥇', '🥈', '🥉'];
 
-    const rows = navne.map((r, i) => ({ name: r[0] || '', amount: gevinst[i] ? gevinst[i][0] : '' }));
+    const rows = navne.map((r, i) => ({
+      name:   r[0] || '',
+      amount: gevinst[i] ? gevinst[i][0] : '',
+      spil:   spil[i]    ? spil[i][0]    : '',
+    }));
     rows.sort((a, b) => (parseFloat(String(b.amount).replace(/[^\d]/g, '')) || 0) - (parseFloat(String(a.amount).replace(/[^\d]/g, '')) || 0));
 
     const tRows = rows.map((r, i) => {
       const cls   = ['rank-1', 'rank-2', 'rank-3'][i] || '';
       const rank  = medals[i] ? `<span class="medal">${medals[i]}</span>` : `<span class="rank-num">${i + 1}.</span>`;
       const bold  = i < 3 ? 'bold' : '';
+      const spilVal = r.spil !== '' && r.spil !== '-' ? r.spil : '<span class="dash">—</span>';
       return `<tr class="${cls}">
           <td style="white-space:nowrap">${rank}</td>
           <td><span class="player-name ${bold}">${r.name}</span></td>
           <td class="num ${bold}">${fmtKr(r.amount)}</td>
+          <td class="num">${spilVal}</td>
         </tr>`;
     }).join('');
 
@@ -156,6 +165,7 @@ async function loadStilling() {
             <th style="width:52px">#</th>
             <th>Spiller</th>
             <th class="num">Gevinst</th>
+            <th class="num">Antal Spil</th>
           </tr></thead>
           <tbody>${tRows}</tbody>
         </table>
