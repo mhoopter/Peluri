@@ -464,11 +464,8 @@ function formatWeekDate() {
 }
 
 async function api(payload) {
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  });
+  const url = APPS_SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
+  const res = await fetch(url);
   return res.json();
 }
 

@@ -69,9 +69,24 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  const action = e.parameter.action || '';
-  if (action === 'week') return jsonResponse(getCurrentWeek());
-  return jsonResponse({ ok: false, error: 'Ukendt action' });
+  try {
+    // Alle kald kommer som GET med ?data=JSON for at undgå CORS
+    if (e.parameter.data) {
+      const data   = JSON.parse(e.parameter.data);
+      const action = data.action;
+      if (action === 'login')     return handleLogin(data);
+      if (action === 'saveToken') return handleSaveToken(data);
+      if (action === 'report')    return handleReport(data);
+      if (action === 'sendPush')  return handleSendPush(data);
+      return jsonResponse({ ok: false, error: 'Ukendt action' });
+    }
+    // Direkte GET
+    const action = e.parameter.action || '';
+    if (action === 'week') return jsonResponse(getCurrentWeek());
+    return jsonResponse({ ok: false, error: 'Ukendt action' });
+  } catch (err) {
+    return jsonResponse({ ok: false, error: err.message });
+  }
 }
 
 // ── Login (ingen PIN — åben adgang med navn) ─────────────────────
