@@ -39,16 +39,48 @@ function parseCSV(text) {
   return rows;
 }
 
+async function fetchWithTimeout(url, ms = 8000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchWithRetry(url, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fetchWithTimeout(url);
+    } catch (e) {
+      if (i === retries - 1) throw e;
+      await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+}
+
 async function fetchCSV(sheetName) {
-  const res = await fetch(sheetUrl(sheetName));
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return parseCSV(await res.text());
+  const text = await fetchWithRetry(sheetUrl(sheetName));
+  return parseCSV(text);
 }
 
 async function fetchURL(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return parseCSV(await res.text());
+  const text = await fetchWithRetry(url);
+  return parseCSV(text);
+}
+
+function saveCache(key, data) {
+  try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {}
+}
+
+function loadCache(key) {
+  try {
+    const c = JSON.parse(localStorage.getItem(key) || 'null');
+    return c ? c.data : null;
+  } catch { return null; }
 }
 
 // ── Formattering ──────────────────────────────────────────────
@@ -79,11 +111,23 @@ async function loadStilling() {
     const gviz = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&range=`;
     const sheet = encodeURIComponent(SHEET_STILLING) + '!';
 
-    const [navne, gevinst, saldoRows] = await Promise.all([
-      fetchURL(gviz + sheet + 'B2:B7'),
-      fetchURL(gviz + sheet + 'C2:C7'),
-      fetchURL(gviz + sheet + 'B25:B25'),
-    ]);
+    let navne, gevinst, saldoRows;
+    try {
+      [navne, gevinst, saldoRows] = await Promise.all([
+        fetchURL(gviz + sheet + 'B2:B7'),
+        fetchURL(gviz + sheet + 'C2:C7'),
+        fetchURL(gviz + sheet + 'B25:B25'),
+      ]);
+      saveCache('stilling_navne', navne);
+      saveCache('stilling_gevinst', gevinst);
+      saveCache('stilling_saldo', saldoRows);
+    } catch (fetchErr) {
+      navne     = loadCache('stilling_navne');
+      gevinst   = loadCache('stilling_gevinst');
+      saldoRows = loadCache('stilling_saldo');
+      if (!navne) throw fetchErr;
+      el.innerHTML += '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:-8px;padding-bottom:8px;">Viser seneste kendte data</div>';
+    }
 
     const saldo = saldoRows[0] ? saldoRows[0][0] : '';
     const medals = ['🥇', '🥈', '🥉'];
@@ -133,7 +177,15 @@ async function loadTotaler() {
   const el = document.getElementById('historik');
   el.innerHTML = '<div class="loading">Henter data</div>';
   try {
-    const rows = await fetchCSV(SHEET_TOTALER);
+    let rows;
+    try {
+      rows = await fetchCSV(SHEET_TOTALER);
+      saveCache('totaler_rows', rows);
+    } catch (fetchErr) {
+      rows = loadCache('totaler_rows');
+      if (!rows) throw fetchErr;
+      el.innerHTML += '<div style="text-align:center;font-size:11px;color:#aaa;margin-top:-8px;padding-bottom:8px;">Viser seneste kendte data</div>';
+    }
 
     // Find header row dynamically (contains 'Medlem')
     const headerIdx = rows.findIndex(r => r.some(c => c && (c.toLowerCase().includes('spiller') || c.toLowerCase().includes('medlem'))));
