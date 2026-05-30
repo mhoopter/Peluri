@@ -465,8 +465,8 @@ function formatWeekDate() {
 
 async function api(payload) {
   const url = APPS_SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
-  const res = await fetch(url);
-  return res.json();
+  // no-cors: omgår CORS-blokeringen — Apps Script modtager og behandler stadig kaldet
+  await fetch(url, { mode: 'no-cors' });
 }
 
 // ── State ────────────────────────────────────────────────────────
@@ -553,8 +553,7 @@ window.submitReport = async function(noWin) {
   const amount = noWin ? 0 : parseInt(document.getElementById('amountInput').value) || 0;
 
   try {
-    const res = await api({ action: 'report', name: currentMember, amount });
-    if (!res.ok) { err.classList.add('show'); return; }
+    await api({ action: 'report', name: currentMember, amount });
     document.getElementById('successMsg').textContent =
       amount > 0
         ? `Du har indberettet ${amount.toLocaleString('da-DK')} kr gevinst. Godt spillet! 🎉`
