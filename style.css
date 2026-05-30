@@ -348,13 +348,59 @@ footer {
 
 /* ── Responsive ── */
 @media (max-width: 600px) {
-  header { padding: 30px 16px 28px; }
-  .logo { width: 180px; }
-  .tab { padding: 16px 20px; font-size: 12px; }
-  main { margin-top: 32px; }
-  .data-table th,
-  .data-table td { padding: 13px 14px; font-size: 13px; }
-  .saldo-value { font-size: 30px; }
-  .section-title { font-size: 18px; }
+  /* Header */
+  header { padding: 24px 16px 22px; }
+
+  .logo-wrap {
+    padding: 10px 20px;
+    border-radius: 10px;
+  }
+
+  .logo { width: 160px; }
+
+  /* Tabs */
+  .tabs { gap: 0; }
+  .tab {
+    flex: 1;
+    padding: 15px 8px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  /* Main */
+  main {
+    margin-top: 24px;
+    padding: 0 10px 48px;
+  }
+
+  .section-title { font-size: 17px; letter-spacing: 2px; }
+  .section-sub   { font-size: 11px; }
+
+  /* Stilling table */
+  #stilling .data-table th,
+  #stilling .data-table td { padding: 13px 14px; font-size: 14px; }
   .player-name { font-size: 14px; }
+
+  /* Historik table: hide the 3 oldest season columns (2020/21, 2021/22, 2022/23) */
+  #historik .data-table th:nth-child(2),
+  #historik .data-table td:nth-child(2),
+  #historik .data-table th:nth-child(3),
+  #historik .data-table td:nth-child(3),
+  #historik .data-table th:nth-child(4),
+  #historik .data-table td:nth-child(4) { display: none; }
+
+  #historik .data-table th,
+  #historik .data-table td { padding: 12px 10px; font-size: 12px; }
+
+  #historik .data-table th:first-child,
+  #historik .data-table td:first-child { width: 32%; }
+
+  /* Saldo */
+  .saldo-box {
+    max-width: 100%;
+    padding: 22px 20px;
+    border-radius: 12px;
+  }
+  .saldo-value { font-size: 32px; }
 }
