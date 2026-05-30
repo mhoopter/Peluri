@@ -251,8 +251,22 @@ async function loadTotaler() {
         </tr>`;
     }).join('');
 
+    // Summering per sæson
+    const colSums = seasonLabels.map((_, si) =>
+      members.reduce((sum, r) => sum + (parseFloat(String(r[si + 1] || '0').replace(/,/g, '')) || 0), 0)
+    );
+    const grandTotal = members.reduce((sum, r) =>
+      sum + (parseFloat(String(r[7] || '0').replace(/,/g, '')) || 0), 0
+    );
+
+    const tFoot = `<tr class="sum-row">
+      <td style="white-space:nowrap"><span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff">Total</span></td>
+      ${colSums.map(s => `<td class="num">${s > 0 ? fmtKr(s) : '<span class="dash">—</span>'}</td>`).join('')}
+      <td class="num">${fmtKr(grandTotal)}</td>
+    </tr>`;
+
     el.innerHTML = `
-      <h2 class="section-title">Totaler per Medlem</h2>
+      <h2 class="section-title">All Time Totals</h2>
       <p class="section-sub">Alle sæsoner</p>
       <div class="section-rule"></div>
       <div class="scroll-wrap table-wrap">
@@ -265,6 +279,7 @@ async function loadTotaler() {
             </tr>
           </thead>
           <tbody>${tRows}</tbody>
+          <tfoot>${tFoot}</tfoot>
         </table>
       </div>
       <p class="swipe-hint">← swipe for alle sæsoner →</p>

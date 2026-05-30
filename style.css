@@ -280,6 +280,17 @@ main {
 
 .dash { color: #DDD; }
 
+/* Total sum row */
+.data-table tfoot .sum-row td {
+  background: linear-gradient(90deg, var(--red-deep), var(--red));
+  color: #fff;
+  font-weight: 700;
+  padding: 14px 20px;
+  border-top: 2px solid var(--red-deep);
+  font-size: 13px;
+}
+.data-table tfoot .sum-row .dash { color: rgba(255,255,255,0.3); }
+
 /* ── Saldo box ── */
 .saldo-box {
   margin: 40px auto 0;
