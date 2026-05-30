@@ -200,16 +200,34 @@
     }
 
     /* ── Amount input wrapper ── */
-    .amount-wrap { position: relative; margin-bottom: 20px; }
-    .amount-wrap input { padding-left: 48px; padding-right: 48px; font-size: 24px; font-weight: 700; text-align: center; }
+    .amount-wrap {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .amount-wrap:focus-within { border-color: var(--red); }
+    .amount-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      padding: 16px 8px 16px 16px;
+      background: transparent;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
     .amount-wrap .currency {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
+      padding: 0 18px 0 4px;
       font-size: 16px;
-      pointer-events: none;
+      font-weight: 600;
+      color: var(--muted);
     }
 
     /* ── Notification permission ── */
@@ -336,15 +354,6 @@
 
 <!-- ── MAIN SCREEN ── -->
 <div class="screen" id="mainScreen">
-
-  <!-- Push notifications -->
-  <div id="notifCard" class="notif-card" onclick="requestPushPermission()">
-    <div class="notif-icon">🔔</div>
-    <div class="notif-text">
-      <div class="notif-title">Aktivér notifikationer</div>
-      <div class="notif-sub">Få besked når det er din uge</div>
-    </div>
-  </div>
 
   <!-- Week info -->
   <div class="week-badge">
@@ -521,20 +530,12 @@ function showMain() {
       </div>`).join('');
   }
 
-  checkNotifStatus();
+  // Registrer push i baggrunden uden at vise UI
+  requestPushPermission();
   showScreen('mainScreen');
 }
 
 // ── Push notifications ───────────────────────────────────────────
-function checkNotifStatus() {
-  const card = document.getElementById('notifCard');
-  if (Notification.permission === 'granted') {
-    card.classList.add('granted');
-    card.innerHTML = '<div class="notif-icon">✅</div><div class="notif-text"><div class="notif-title">Notifikationer aktiveret</div><div class="notif-sub">Du vil få besked når det er din uge</div></div>';
-    card.onclick = null;
-  }
-}
-
 window.requestPushPermission = async function() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   try {
